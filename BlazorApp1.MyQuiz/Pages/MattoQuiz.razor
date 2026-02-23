@@ -1,0 +1,41 @@
+﻿@page "/"
+
+<link rel="stylesheet" href="" />
+
+<PageTitle>Home</PageTitle>
+
+<h1 class="Home">Home</h1>
+
+<p class="text">Welcome to my Blazor website!</p>
+
+<p class="text">This application consists of this page and a 20-question quiz.
+	I plan to add another quiz and additional games in the future.
+</p>
+
+<h3 class="Rules">The Rules</h3>
+
+<p class="rulesExplain">The quiz consists of 20 multiple choice questions, <b>each question has 4 possible answers 
+	and there is no time limit</b>. After answering each question, the correct answer will be highlighted in green and your 
+	option (if incorrect) will be highlighted in red. If you answer the question correctly, the correct answer will appear. If 
+	you answer incorrectly, the correct answer will appear afterwards. 
+</p>
+
+<p class="Categories">The categories for the quiz questions are as follows:</p>
+
+<ul class="QuizCategories">
+	<li class="Sports">Sports</li>
+	<li class="Pairs">Famous Pairs</li>
+	<li class="History">European History</li>
+	<li class="LEGO">LEGO</li>
+</ul>
+
+<p class="text">Click on the button below to play the quiz!</p>
+<NavLink href="/Page">
+<button class="PlayQuiz">
+		<b>Play Quiz</b>
+</button>
+</NavLink>
+
+
+
+			<!--Method for printing answers next-->

@@ -1,0 +1,294 @@
+﻿@page "/Page"
+
+<PageTitle>Quiz</PageTitle>
+
+<h1 class="QuizTitle">Quiz</h1>
+
+@if (showIntro)
+{
+	<div class="PreQuiz">
+		<p class="text">Here is the quiz...</p>
+		<p class="text">
+			It consists of 20 questions, each with 4 answers. There is no time limit
+			so play at your own pace.
+		</p>
+		<p class="text">You will recieve your score out of 20 in the end, and the option to replay the quiz.</p>
+		<p class="GoodLuck">Good luck!</p>
+		<button class="Begin" type="submit" href="Home" @onclick="BeginQuiz">Begin</button>
+	</div>
+}
+
+else if (currentQuestion < questionData.Count)
+{
+	<div class="quiz-container">
+		<h2 class="CurrentQuestion">Question @(currentQuestion + 1)</h2>
+		<p class="TheQuestion">@questionData[currentQuestion].Question</p>
+		<div class="options">
+			@for (int i = 0; i < questionData[currentQuestion].Options.Count; i++)
+			{
+				var index = i;
+				<button class="@GetOptionsClass(index)" @onclick="() => SelectOption(index)" disabled="@hasBeenAnswered">
+					@questionData[currentQuestion].Options[i]
+				</button>
+			}
+			<button type="submit" id="RetryButton" href="Home" 
+				class="Retry" onclick="RetryPrompt()">Retry</button>
+		</div>
+		@if (hasBeenAnswered)
+		{
+			<div class="feedback">
+				@if (userSelection == questionData[currentQuestion].CorrectAnswer)
+				{
+					<p class="right">Correct!</p>
+					<p class="rightanswer">The answer is: @questionData[currentQuestion].Options[questionData[currentQuestion].CorrectAnswer]</p>
+				}
+				else
+				{
+					<p class="wrong">Incorrect!</p>
+					<p class="right">The correct answer actually is: @questionData[currentQuestion].Options[questionData[currentQuestion].CorrectAnswer]</p>
+				}
+			</div>
+			@if (currentQuestion < questionData.Count - 1)
+			{
+				<button class="nextButton" @onclick="NextQuestion">Next Question</button>
+			}
+			else
+			{
+				<button class="nextButton" @onclick="ShowResults">Show Results</button>
+			}
+
+		}
+
+	</div>
+}
+else
+{
+	<div class="results">
+		<h2 class="QuizComplete">Quiz Complete!</h2>
+		<p class="EndOfQuiz">Correct Answers: <b> @noOfCorrectAnswers</b></p>
+		<p class="EndOfQuiz">Incorrect Answers: <b> @(questionData.Count - noOfCorrectAnswers)</b></p>
+		<p class="EndOfQuiz">Total Score: <b> @noOfCorrectAnswers / @questionData.Count</b></p>
+		<p class="EndOfQuiz">As a Percentage: <b> @((float)@noOfCorrectAnswers / @questionData.Count * 100) % </b></p>
+		<button class="PlayAgain" type="submit" href="Home" @onclick="ResetQuiz">Play Again</button>
+	</div>
+}
+
+@code
+{
+	private bool showIntro = true;
+
+	private List<QuizQuestions> questionData = new List<QuizQuestions>
+	{
+		new QuizQuestions
+		{
+			Question = "In Gaelic Football, who won the GAA senior club football all ireland final in 2025?",
+			Options = new List<string> {"Errigal Ciaran", "Dr Crokes", "Cuala", "Coolera-Strandhill"},
+			CorrectAnswer = 2 // Cuala is index 2
+		},
+		new QuizQuestions
+		{
+			Question = "In Hurling, who won the GAA senior club football all ireland final in 2025?",
+			Options = new List<string> {"Sarsfields", "Na Fianna", "Slaughtneil", "Loughrea"},
+			CorrectAnswer = 1 // Na Fianna are index 1
+		},
+		new QuizQuestions
+		{
+			Question = "Which Premier League team has spent the longest time without getting relegated in England's top flight (since 1888)?",
+			Options = new List<string> {"Manchester United", "Aston Villa", "Liverpool", "Arsenal"},
+			CorrectAnswer = 3
+		},
+		new QuizQuestions
+		{
+			Question = "Which Rugby team has the most success in the European Champions Cup?",
+			Options = new List<string> {"Leinster", "Cardiff", "Toulouse", "Saracens"},
+			CorrectAnswer = 2
+		},
+		new QuizQuestions
+		{
+			Question = "Which of these Formula 1 teams has Lewis Hamilton not raced for?",
+			Options = new List<string> {"McLaren", "Mercedes", "Williams", "Ferrari"},
+			CorrectAnswer = 2
+		},
+		new QuizQuestions
+		{
+			Question = "Which of these duos work for the Trotters Independent Trading Company??",
+			Options = new List<string> {"Mario and Luigi", "Delboy and Rodney", "Jeeves and Wooster", "Marty McFly and Doc Brown"},
+			CorrectAnswer = 1
+		},
+		new QuizQuestions
+		{
+			Question = "Which of these duos does not involve a human and a talking dog?",
+			Options = new List<string> {"Shaggy and Scooby Doo", "Finn and Jake", "Wallace and Gromit", "Brian and Stewie Griffin"},
+			CorrectAnswer = 2
+		},
+		new QuizQuestions
+		{
+			Question = "Which of these artists have worked on the most songs together?",
+			Options = new List<string> {"Camilla Cabelllo and Shawn Mendes", "Rihanna and Calvin Harris", "Eminem and 50 Cent", "PinkPantheress and Zara Larsson"},
+			CorrectAnswer = 2
+		},
+		new QuizQuestions
+		{
+			Question = "Which of these actors have starred in the most movies together?",
+			Options = new List<string> {"Dwayne Johnston and Kevin Hart", "Chris Hemsworth and Tom Hiddleston", "Jamie Lee Curtis and Lindsey Lohan", "Tina Fey and Amy Poehler"},
+			CorrectAnswer = 3
+		},
+		new QuizQuestions
+		{
+			Question = "Which of these duos did not originate from a comic book?",
+			Options = new List<string> {"Batman and Robin", "Sherlock Holmes and Dr Watson", "Cloak and Dagger", "Snoopy and Woodstock"},
+			CorrectAnswer = 1
+		},
+		new QuizQuestions
+		{
+			Question = "Which of these countries celebrated Halloween first?",
+			Options = new List<string> {"Spain", "Italy", "Ireland", "Romania"},
+			CorrectAnswer = 2
+		},
+		new QuizQuestions
+		{
+			Question = "Which of these countries did not regain indepencence after the First World War?",
+			Options = new List<string> {"Bulgaria", "Estonia", "Poland", "Hungary"},
+			CorrectAnswer = 0
+		},
+		new QuizQuestions
+		{
+			Question = "Which of these Irish historical figures was born last?",
+			Options = new List<string> {"Robert Emmet", "Hugh O'Neill", "Charles Stewart Parnell", "Michael Collins"},
+			CorrectAnswer = 3
+		},
+		new QuizQuestions
+		{
+			Question = "In what county was the historic Ballykinlar prison camp formerly located in? ",
+			Options = new List<string> {"Offaly", "Down", "Kerry", "Mayo"},
+			CorrectAnswer = 1
+		},
+		new QuizQuestions
+		{
+			Question = "In what decade did the Industrial Revolution begin?",
+			Options = new List<string> {"1760s", "1780s", "1800s", "1820s"},
+			CorrectAnswer = 0
+		},
+		new QuizQuestions
+		{
+			Question = "Which one of these franchises does not have a Lego BrickHeadz set as of 2026?",
+			Options = new List<string> {"Tom and Jerry", "FC Barcelona", "Minecraft", "Indiana Jones"},
+			CorrectAnswer = 3
+		},
+		new QuizQuestions
+		{
+			Question = "The LEGO store in Belfast opened in what month of 2025?",
+			Options = new List<string> {"May", "June", "July", "August"},
+			CorrectAnswer = 3
+		},
+		new QuizQuestions
+		{
+			Question = "Which of these characters took the longest to recieve an official LEGO minifigure?",
+			Options = new List<string> {"Frodo Baggins", "Hiccup", "Link", "Prince Charming"},
+			CorrectAnswer = 2
+		},
+		new QuizQuestions
+		{
+			Question = "What country is LEGO based in?",
+			Options = new List<string> {"Sweden", "USA", "Japan", "Denmark"},
+			CorrectAnswer = 3
+		},
+		new QuizQuestions
+		{
+			Question = "Which of these car models has a LEGO Technic set?",
+			Options = new List<string> {"Lamborghini Revuelto", "Ferrari LaFerrari", "Lotus Exige S", "Hennessey Venom GT"},
+			CorrectAnswer = 0
+		}
+	};
+
+	private int currentQuestion = 0; // tracks the current question
+	private int userSelection = -1;
+	private bool hasBeenAnswered = false;
+	private int noOfCorrectAnswers = 0;
+
+	private void BeginQuiz()
+	{
+		showIntro = false;
+		currentQuestion = 0;
+		userSelection = -1;
+		hasBeenAnswered = false;
+		noOfCorrectAnswers = 0;
+	}
+
+	// private void RetryPrompt()
+	// {
+	// 	showIntro = false;
+	// 	currentQuestion = 0;
+	// 	userSelection = -1;
+	// 	hasBeenAnswered = false;
+	// 	noOfCorrectAnswers = 0;
+	// }
+
+	private void SelectOption(int index)
+	{
+		if (!hasBeenAnswered)
+		{
+			userSelection = index;
+			hasBeenAnswered = true;
+
+			if (index == questionData[currentQuestion].CorrectAnswer)
+			{
+				noOfCorrectAnswers++; // increments by 1
+			}
+		}
+	}
+	private void NextQuestion()
+	{
+		currentQuestion++;
+		userSelection = -1; // blank option
+		hasBeenAnswered = false;
+	}
+
+	private void ShowResults()
+	{
+		Console.WriteLine("Thanks for playing the quiz, you score will be revealed!");
+		currentQuestion = questionData.Count;
+	}
+	// will return options css class
+	private string GetOptionsClass(int index)
+	{
+		if (!hasBeenAnswered)
+		{
+			return "option";
+		}
+		// if it is correct answer then return that answer is correct
+		if (index == questionData[currentQuestion].CorrectAnswer)
+		{
+			return "option correct";
+		}
+		// else return that it is wrong
+		if (index == userSelection)
+		{
+			return "option wrong";
+		}
+		return "option";
+	}
+
+	private void ResetQuiz()
+	{
+		showIntro = true;
+		currentQuestion = 0;
+		userSelection = -1;
+		hasBeenAnswered = false;
+		noOfCorrectAnswers = 0;
+	}
+}
+
+<script>
+		function RetryPrompt() {
+			document.getElementById('#RetryButton');
+			const confirmed = confirm("Are you sure you would like to restart this quiz from the beginning?");
+			console.log("A");
+			if (confirmed) {
+			window.location.replace("/Page");
+			} 
+			else {
+				window.alert("Continue the quiz.")
+			}
+		}
+</script>
